@@ -1,8 +1,11 @@
 import './App.css';
-import { ethers} from "ethers"
-import { Container, Box, CssBaseline, Button, Card} from '@material-ui/core';
-import {Stack, TextField} from "@mui/material"
 import React from "react"
+import NavBar from './routes/Nav';
+import {Route, Routes} from "react-router-dom"
+import Home from "./components/Home"
+import CreateWallet from "./components/CreateWallet"
+import NewWallet from "./components/ImportWallet"
+import StartTransaction from "./components/Send"
 
 // ========= NOTICE =========
 // formatter.ts:511 Request-Rate Exceeded  (this message will not be repeated)
@@ -22,104 +25,16 @@ import React from "react"
 // 31874babf984a6b0442378122379ed5d50f4f37f5e7f519a0a54d5adf3aefcf1
 
 function App() {
-
-  const [existWallet, setExistWallet] = React.useState(false)
-  const [createWallet, setCreateWallet] = React.useState(false)
-  const [address, setAddress] = React.useState('')
-  const [show, setShow] = React.useState(false)
-  const [balance, setBalance] = React.useState(null)
-  const [loading,setLoading] = React.useState(false)
-  const [memonic, setMemonic] = React.useState('')
-  const [key, setKey] = React.useState('')
-
-  const createNewWallet = () => {
-    setExistWallet(false)
-    setCreateWallet(true)
-    creating()
-  }
-
-  const creating = async () => {
-    setLoading(true)
-    const ok = ethers.Wallet.createRandom();
-    const provider = ethers.getDefaultProvider()
-    const conn = ok.connect(provider)
-    const bal = await conn.getBalance()
-    const final_bal = ethers.utils.formatUnits(bal)
-    setBalance(final_bal)
-    setAddress(ok.address)
-    setShow(true)
-    setLoading(false)
-  }
-
-  const loadExistWallet = () => {
-    setCreateWallet(false)
-    setExistWallet(true)
-  }
-  const loadWalletData = async () => {
-    if(memonic != ''){
-      setLoading(true)
-      let wal = ethers.Wallet.fromMnemonic(memonic)
-      const provider = ethers.getDefaultProvider()
-      const conn = wal.connect(provider)
-      const bal = await conn.getBalance()
-      const final_bal = ethers.utils.formatUnits(bal)
-      setBalance(final_bal)
-      setAddress(wal.address)
-      setShow(true)
-      setLoading(false)
-    }else if (key != ''){
-      setLoading(true)
-      let wal = new ethers.Wallet(key)
-      const provider = ethers.getDefaultProvider()
-      const conn = wal.connect(provider)
-      const bal = await conn.getBalance()
-      const final_bal = ethers.utils.formatUnits(bal)
-      setBalance(final_bal)
-      setAddress(wal.address)
-      setShow(true)
-      setLoading(false)
-    }else{
-      window.alert('Invalid Input !')
-    }
-  }
   return (
-    <div className="App">
-      <CssBaseline />
-      <Container maxWidth="sm">
-        <Box sx={{ bgcolor: '#cfe8fc', height: '70vh' }}>
-        <Stack spacing={17} direction="row">
-        <Button variant="contained" 
-        style = {{background: '#0063cc', color: 'white'}} onClick = {createNewWallet}>Create New Wallet</Button>
-        <Button variant="contained" 
-        style = {{background: '#0063cc', color: 'white'}} onClick = {loadExistWallet}>Import Existing Wallet</Button>
-        </Stack>
-        {createWallet && <Box sx={{ bgcolor: 'white', height: '30vh' }}>
-          {loading && <h1>{'loading....'}</h1>}
-          {show && <div>
-            <h1>Your Wallet Address & Balance is :</h1>
-          <p>{address}</p>
-          <p>{balance}</p></div>}
-          </Box>}
-          {existWallet && <Box sx={{ bgcolor: 'white', height: '50vh', paddingTop: '20px', marginTop: '20px' }}>
-          <Stack spacing={10} direction="row">
-          <TextField id="outlined-basic" label="Memonic" variant="outlined"
-          onChange = {(e) => setMemonic(e.target.value)} />
-            <h1>OR</h1>
-            <TextField id="outlined-basic" label="Private Key" variant="outlined"
-            onChange = {(e) => setKey(e.target.value)} />
-          </Stack>
-          <Button variant="contained" 
-        style = {{background: '#0063cc', color: 'white'}} onClick = {loadWalletData}>SUBMIT</Button>
-         {loading && <h1>{'loading....'}</h1>}
-        {show && <div>
-          <h1>Your Wallet Address & Balance is :</h1>
-          <p>{address}</p>
-          <p>{balance}</p>
-          </div>}
-          </Box>}
-        </Box>
-      </Container>
-    </div>
+    <>
+     <NavBar />
+     <Routes>
+       <Route path = "/" element = {<Home />}></Route>
+       <Route path = "/createWallet" element = {<CreateWallet />}></Route>
+       <Route path = "/importWallet" element = {<NewWallet />}></Route>
+       <Route path = '/trancsaction' element = {<StartTransaction />}></Route>
+     </Routes>
+    </>
   );
 }
 
